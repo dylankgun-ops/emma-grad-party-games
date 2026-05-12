@@ -34,10 +34,7 @@ export default function Leaderboard() {
     });
 
     const result = Object.values(grouped)
-      .map((p) => ({
-        ...p,
-        total: p.gameScore + p.dishScore
-      }))
+      .map((p) => ({ ...p, total: p.gameScore + p.dishScore }))
       .sort((a, b) => b.total - a.total);
 
     setPlayers(result);
@@ -52,7 +49,7 @@ export default function Leaderboard() {
           <div style={styles.badge}>🏆 Emma’s Grad Party</div>
           <h1 style={styles.title}>Party Leaderboard</h1>
           <p style={styles.subtitle}>
-            Scores include submitted game points and Mystery Basket judging votes.
+            Scores include TV games, Emma trivia, Wordle, and Mystery Basket judging votes.
           </p>
 
           <button style={styles.button} onClick={load}>
@@ -72,7 +69,7 @@ export default function Leaderboard() {
             </div>
 
             <div style={styles.breakdown}>
-              <span>Game Score: {player.gameScore}</span>
+              <span>Game + Trivia Score: {player.gameScore}</span>
               <span>Dish Score: {player.dishScore}</span>
             </div>
           </section>
@@ -87,17 +84,10 @@ export default function Leaderboard() {
 function Nav({ bottom }) {
   return (
     <nav style={{ ...styles.navButtons, marginTop: bottom ? 24 : 0 }}>
-      <a style={styles.navButton} href="/">
-        🏠 Main Menu
-      </a>
-
-      <a style={styles.navButton} href="/leaderboard">
-        🏆 Party Leaderboard
-      </a>
-
-      <a style={styles.navButton} href="/admin">
-        🔪 Judge Chopped Dishes
-      </a>
+      <a style={styles.navButton} href="/">🏠 Main Menu</a>
+      <a style={styles.navButton} href="/emma">💕 How Well Do You Know Emma?</a>
+      <a style={styles.navButton} href="/leaderboard">🏆 Party Leaderboard</a>
+      <a style={styles.navButton} href="/admin">🔪 Judge Chopped Dishes</a>
     </nav>
   );
 }
@@ -111,19 +101,8 @@ const styles = {
     fontFamily: "Georgia, 'Times New Roman', serif",
     color: "#3b2f3f"
   },
-
-  container: {
-    maxWidth: 1000,
-    margin: "0 auto"
-  },
-
-  navButtons: {
-    display: "flex",
-    flexWrap: "wrap",
-    gap: 12,
-    marginBottom: 22
-  },
-
+  container: { maxWidth: 1000, margin: "0 auto" },
+  navButtons: { display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 22 },
   navButton: {
     display: "inline-block",
     background: "rgba(255,255,255,.9)",
@@ -135,7 +114,6 @@ const styles = {
     border: "1px solid #f2cddd",
     boxShadow: "0 8px 20px rgba(0,0,0,.06)"
   },
-
   heroCard: {
     background: "rgba(255,255,255,.86)",
     borderRadius: 28,
@@ -144,7 +122,6 @@ const styles = {
     border: "1px solid rgba(255,255,255,.8)",
     boxShadow: "0 18px 45px rgba(65,35,55,.10)"
   },
-
   badge: {
     display: "inline-block",
     background: "#ffe4b8",
@@ -154,7 +131,6 @@ const styles = {
     fontWeight: 800,
     fontSize: 14
   },
-
   title: {
     fontSize: "clamp(42px,7vw,76px)",
     lineHeight: ".92",
@@ -162,13 +138,7 @@ const styles = {
     marginBottom: 18,
     letterSpacing: "-2px"
   },
-
-  subtitle: {
-    color: "#6f6072",
-    fontSize: 17,
-    lineHeight: 1.6
-  },
-
+  subtitle: { color: "#6f6072", fontSize: 17, lineHeight: 1.6 },
   button: {
     marginTop: 16,
     padding: "14px 18px",
@@ -179,7 +149,6 @@ const styles = {
     fontWeight: 900,
     cursor: "pointer"
   },
-
   card: {
     background: "rgba(255,255,255,.86)",
     borderRadius: 28,
@@ -188,7 +157,6 @@ const styles = {
     border: "1px solid rgba(255,255,255,.8)",
     boxShadow: "0 18px 45px rgba(65,35,55,.10)"
   },
-
   rankRow: {
     display: "flex",
     justifyContent: "space-between",
@@ -196,22 +164,9 @@ const styles = {
     alignItems: "center",
     flexWrap: "wrap"
   },
-
-  rank: {
-    color: "#be185d",
-    fontWeight: 900
-  },
-
-  name: {
-    fontSize: "clamp(28px,5vw,42px)",
-    margin: "6px 0"
-  },
-
-  total: {
-    fontSize: 38,
-    fontWeight: 900
-  },
-
+  rank: { color: "#be185d", fontWeight: 900 },
+  name: { fontSize: "clamp(28px,5vw,42px)", margin: "6px 0" },
+  total: { fontSize: 38, fontWeight: 900 },
   breakdown: {
     display: "flex",
     gap: 10,

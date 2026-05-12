@@ -71,8 +71,8 @@ export default function Admin() {
           <div style={styles.badge}>🔪 Chopped Judging Table</div>
           <h1 style={styles.title}>Judge the Mystery Basket Dishes</h1>
           <p style={styles.subtitle}>
-            Each judge can vote once per dish. Votes are saved separately instead
-            of overwriting the last judge.
+            Each judge can vote once per dish. Top Dish = 3, Safe = 2,
+            Chopped = 1.
           </p>
 
           <input
@@ -111,7 +111,7 @@ export default function Admin() {
                 <button
                   disabled={lockedForJudge}
                   style={styles.button}
-                  onClick={() => judge(entry.id, "Top Dish", 10)}
+                  onClick={() => judge(entry.id, "Top Dish", 3)}
                 >
                   Top Dish
                 </button>
@@ -119,7 +119,7 @@ export default function Admin() {
                 <button
                   disabled={lockedForJudge}
                   style={styles.button}
-                  onClick={() => judge(entry.id, "Safe", 7)}
+                  onClick={() => judge(entry.id, "Safe", 2)}
                 >
                   Safe
                 </button>
@@ -127,7 +127,7 @@ export default function Admin() {
                 <button
                   disabled={lockedForJudge}
                   style={styles.button}
-                  onClick={() => judge(entry.id, "Chopped", 3)}
+                  onClick={() => judge(entry.id, "Chopped", 1)}
                 >
                   Chopped
                 </button>
@@ -162,17 +162,10 @@ export default function Admin() {
 function Nav({ bottom }) {
   return (
     <nav style={{ ...styles.navButtons, marginTop: bottom ? 24 : 0 }}>
-      <a style={styles.navButton} href="/">
-        🏠 Main Menu
-      </a>
-
-      <a style={styles.navButton} href="/leaderboard">
-        🏆 Party Leaderboard
-      </a>
-
-      <a style={styles.navButton} href="/admin">
-        🔪 Judge Chopped Dishes
-      </a>
+      <a style={styles.navButton} href="/">🏠 Main Menu</a>
+      <a style={styles.navButton} href="/emma">💕 How Well Do You Know Emma?</a>
+      <a style={styles.navButton} href="/leaderboard">🏆 Party Leaderboard</a>
+      <a style={styles.navButton} href="/admin">🔪 Judge Chopped Dishes</a>
     </nav>
   );
 }
@@ -186,19 +179,8 @@ const styles = {
     fontFamily: "Georgia, 'Times New Roman', serif",
     color: "#3b2f3f"
   },
-
-  container: {
-    maxWidth: 1120,
-    margin: "0 auto"
-  },
-
-  navButtons: {
-    display: "flex",
-    flexWrap: "wrap",
-    gap: 12,
-    marginBottom: 22
-  },
-
+  container: { maxWidth: 1120, margin: "0 auto" },
+  navButtons: { display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 22 },
   navButton: {
     display: "inline-block",
     background: "rgba(255,255,255,.9)",
@@ -210,7 +192,6 @@ const styles = {
     border: "1px solid #f2cddd",
     boxShadow: "0 8px 20px rgba(0,0,0,.06)"
   },
-
   heroCard: {
     background: "rgba(255,255,255,.86)",
     borderRadius: 28,
@@ -219,7 +200,6 @@ const styles = {
     border: "1px solid rgba(255,255,255,.8)",
     boxShadow: "0 18px 45px rgba(65,35,55,.10)"
   },
-
   badge: {
     display: "inline-block",
     background: "#ffe4b8",
@@ -229,7 +209,6 @@ const styles = {
     fontWeight: 800,
     fontSize: 14
   },
-
   title: {
     fontSize: "clamp(42px,7vw,76px)",
     lineHeight: ".92",
@@ -238,13 +217,7 @@ const styles = {
     letterSpacing: "-2px",
     color: "#3b2f3f"
   },
-
-  subtitle: {
-    color: "#6f6072",
-    fontSize: 17,
-    lineHeight: 1.6
-  },
-
+  subtitle: { color: "#6f6072", fontSize: 17, lineHeight: 1.6 },
   card: {
     background: "rgba(255,255,255,.86)",
     borderRadius: 28,
@@ -253,13 +226,11 @@ const styles = {
     border: "1px solid rgba(255,255,255,.8)",
     boxShadow: "0 18px 45px rgba(65,35,55,.10)"
   },
-
   sectionTitle: {
     fontSize: "clamp(28px,5vw,42px)",
     lineHeight: 1,
     marginTop: 0
   },
-
   input: {
     width: "100%",
     marginTop: 12,
@@ -271,26 +242,9 @@ const styles = {
     background: "white",
     color: "#3b2f3f"
   },
-
-  basketText: {
-    color: "#6f6072",
-    lineHeight: 1.6
-  },
-
-  voteStats: {
-    display: "flex",
-    flexWrap: "wrap",
-    gap: 10,
-    marginTop: 14
-  },
-
-  buttonRow: {
-    display: "flex",
-    flexWrap: "wrap",
-    gap: 10,
-    marginTop: 16
-  },
-
+  basketText: { color: "#6f6072", lineHeight: 1.6 },
+  voteStats: { display: "flex", flexWrap: "wrap", gap: 10, marginTop: 14 },
+  buttonRow: { display: "flex", flexWrap: "wrap", gap: 10, marginTop: 16 },
   button: {
     padding: "12px 16px",
     borderRadius: 16,
@@ -300,25 +254,14 @@ const styles = {
     fontWeight: 900,
     cursor: "pointer"
   },
-
-  locked: {
-    color: "#be123c",
-    fontWeight: 800
-  },
-
-  voteList: {
-    marginTop: 18,
-    display: "grid",
-    gap: 8
-  },
-
+  locked: { color: "#be123c", fontWeight: 800 },
+  voteList: { marginTop: 18, display: "grid", gap: 8 },
   vote: {
     background: "#fff7fa",
     border: "1px solid #f2d5e0",
     borderRadius: 14,
     padding: 12
   },
-
   toast: {
     position: "fixed",
     bottom: 20,

@@ -53,6 +53,12 @@ const ingredients = [
 const WORDLE_WORD = "BREAD";
 const WORDLE_MAX_GUESSES = 6;
 
+function normalizeText(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
+}
+
 export default function Home() {
   const [player, setPlayer] = useState(null);
   const [name, setName] = useState("");
@@ -118,7 +124,7 @@ export default function Home() {
 
     let score = 0;
     quotes.forEach((q) => {
-      if (quoteAnswers[q.id] === q.answer) score++;
+      if (normalizeText(quoteAnswers[q.id]) === normalizeText(q.answer)) score++;
     });
 
     await supabase.from("submissions").insert({
@@ -138,11 +144,7 @@ export default function Home() {
 
     let score = 0;
     scrambles.forEach((s, idx) => {
-      const guess = (scrambleAnswers[idx] || "")
-        .toUpperCase()
-        .replace(/[^A-Z]/g, "");
-
-      if (guess === s.answer) score += 2;
+      if (normalizeText(scrambleAnswers[idx]) === normalizeText(s.answer)) score += 2;
     });
 
     await supabase.from("submissions").insert({
@@ -257,9 +259,7 @@ export default function Home() {
         <div style={styles.hero}>
           <section style={styles.heroCard}>
             <div style={styles.badge}>🎓 Pomona College Graduation Party for Emma</div>
-
             <h1 style={styles.title}>Emma’s TV-Themed Grad Party Game Lounge</h1>
-
             <p style={styles.subtitle}>
               Cute, competitive, and a little chaotic. Play Gilmore Girls, New Girl,
               Chopped, and Wordle party games with locked submissions and live results.
@@ -276,14 +276,12 @@ export default function Home() {
         {!player && (
           <section style={styles.card}>
             <h2 style={styles.sectionTitle}>Enter your name or team</h2>
-
             <input
               style={styles.input}
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Example: Team Emma"
             />
-
             <button style={styles.button} onClick={createPlayer}>
               Start Playing
             </button>
@@ -406,12 +404,7 @@ export default function Home() {
                         return (
                           <div
                             key={cellIdx}
-                            style={{
-                              ...styles.wordleBox,
-                              background,
-                              color,
-                              border
-                            }}
+                            style={{ ...styles.wordleBox, background, color, border }}
                           >
                             {letter}
                           </div>
@@ -444,7 +437,6 @@ export default function Home() {
 
             <section style={styles.card}>
               <h2 style={styles.sectionTitle}>Mystery Basket</h2>
-
               <p>Generate a basket, create a dish, then submit it for judging.</p>
 
               <div style={styles.basketGrid}>
@@ -500,6 +492,10 @@ function Nav({ bottom }) {
         🏠 Main Menu
       </a>
 
+      <a style={styles.navButton} href="/emma">
+        💕 How Well Do You Know Emma?
+      </a>
+
       <a style={styles.navButton} href="/leaderboard">
         🏆 Party Leaderboard
       </a>
@@ -520,19 +516,8 @@ const styles = {
     fontFamily: "Georgia, 'Times New Roman', serif",
     color: "#3b2f3f"
   },
-
-  container: {
-    maxWidth: 1120,
-    margin: "0 auto"
-  },
-
-  navButtons: {
-    display: "flex",
-    flexWrap: "wrap",
-    gap: 12,
-    marginBottom: 22
-  },
-
+  container: { maxWidth: 1120, margin: "0 auto" },
+  navButtons: { display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 22 },
   navButton: {
     display: "inline-block",
     background: "rgba(255,255,255,.9)",
@@ -544,14 +529,12 @@ const styles = {
     border: "1px solid #f2cddd",
     boxShadow: "0 8px 20px rgba(0,0,0,.06)"
   },
-
   hero: {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))",
     gap: 20,
     marginBottom: 20
   },
-
   heroCard: {
     background: "rgba(255,255,255,.86)",
     borderRadius: 28,
@@ -560,7 +543,6 @@ const styles = {
     boxShadow: "0 18px 45px rgba(65,35,55,.10)",
     backdropFilter: "blur(10px)"
   },
-
   badge: {
     display: "inline-block",
     background: "#ffe4b8",
@@ -570,7 +552,6 @@ const styles = {
     fontWeight: 800,
     fontSize: 14
   },
-
   title: {
     fontSize: "clamp(42px,7vw,76px)",
     lineHeight: ".92",
@@ -579,13 +560,7 @@ const styles = {
     letterSpacing: "-2px",
     color: "#3b2f3f"
   },
-
-  subtitle: {
-    color: "#6f6072",
-    fontSize: 17,
-    lineHeight: 1.6
-  },
-
+  subtitle: { color: "#6f6072", fontSize: 17, lineHeight: 1.6 },
   scoreCard: {
     background: "rgba(255,255,255,.86)",
     borderRadius: 28,
@@ -593,7 +568,6 @@ const styles = {
     border: "1px solid rgba(255,255,255,.8)",
     boxShadow: "0 18px 45px rgba(65,35,55,.10)"
   },
-
   scoreLabel: {
     textTransform: "uppercase",
     letterSpacing: 3,
@@ -601,13 +575,7 @@ const styles = {
     color: "#9b879b",
     fontWeight: 900
   },
-
-  score: {
-    fontSize: 68,
-    fontWeight: 900,
-    marginTop: 10
-  },
-
+  score: { fontSize: 68, fontWeight: 900, marginTop: 10 },
   card: {
     background: "rgba(255,255,255,.86)",
     borderRadius: 28,
@@ -617,13 +585,11 @@ const styles = {
     boxShadow: "0 18px 45px rgba(65,35,55,.10)",
     backdropFilter: "blur(10px)"
   },
-
   sectionTitle: {
     fontSize: "clamp(30px,5vw,42px)",
     lineHeight: 1,
     marginTop: 0
   },
-
   question: {
     background: "rgba(255,247,250,.9)",
     padding: 18,
@@ -631,7 +597,6 @@ const styles = {
     marginTop: 16,
     border: "1px solid #f2d5e0"
   },
-
   quote: {
     background: "#fff1f7",
     borderLeft: "4px solid #ef7aa8",
@@ -639,7 +604,6 @@ const styles = {
     borderRadius: 14,
     fontStyle: "italic"
   },
-
   input: {
     width: "100%",
     marginTop: 12,
@@ -651,7 +615,6 @@ const styles = {
     background: "white",
     color: "#3b2f3f"
   },
-
   button: {
     marginTop: 16,
     padding: "14px 18px",
@@ -662,7 +625,6 @@ const styles = {
     fontWeight: 900,
     cursor: "pointer"
   },
-
   secondaryButton: {
     marginTop: 16,
     padding: "14px 18px",
@@ -673,7 +635,6 @@ const styles = {
     fontWeight: 900,
     cursor: "pointer"
   },
-
   scramble: {
     fontSize: 24,
     letterSpacing: 6,
@@ -681,7 +642,6 @@ const styles = {
     marginTop: 10,
     wordBreak: "break-word"
   },
-
   wordleGrid: {
     display: "flex",
     flexDirection: "column",
@@ -689,13 +649,7 @@ const styles = {
     marginTop: 20,
     overflowX: "auto"
   },
-
-  wordleRow: {
-    display: "flex",
-    gap: 8,
-    flexWrap: "nowrap"
-  },
-
+  wordleRow: { display: "flex", gap: 8, flexWrap: "nowrap" },
   wordleBox: {
     width: "clamp(44px,12vw,58px)",
     height: "clamp(44px,12vw,58px)",
@@ -707,14 +661,12 @@ const styles = {
     fontSize: 24,
     flexShrink: 0
   },
-
   basketGrid: {
     display: "grid",
     gridTemplateColumns: "repeat(auto-fit,minmax(120px,1fr))",
     gap: 10,
     marginTop: 16
   },
-
   ingredient: {
     background: "#fff1c7",
     padding: 16,
@@ -724,7 +676,6 @@ const styles = {
     textTransform: "capitalize",
     border: "1px solid #ffe2a3"
   },
-
   entry: {
     background: "#fff7fa",
     borderRadius: 16,
@@ -732,7 +683,6 @@ const styles = {
     marginTop: 12,
     border: "1px solid #f2d5e0"
   },
-
   toast: {
     position: "fixed",
     bottom: 20,
