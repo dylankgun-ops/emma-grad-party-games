@@ -3,8 +3,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "../lib/supabase";
 
-const WORDLE_WORD = "LOFT";
-
 const quotes = [
   {
     id: "gg1",
@@ -35,6 +33,9 @@ const scrambles = [
   }
 ];
 
+const WORDLE_WORD = "BREAD";
+const WORDLE_MAX_GUESSES = 6;
+
 export default function Home() {
   const [player, setPlayer] = useState(null);
   const [name, setName] = useState("");
@@ -52,6 +53,8 @@ export default function Home() {
   }, [player]);
 
   async function createPlayer() {
+    if (!name.trim()) return;
+
     const { data, error } = await supabase
       .from("players")
       .insert({ name })
@@ -125,30 +128,95 @@ export default function Home() {
     loadSubmissions(player.id);
   }
 
-  function scoreWordleGuess(guess) {
-    return guess.toUpperCase() === WORDLE_WORD;
+  function getWordleMarks(guess) {
+    const target = WORDLE_WORD.split("");
+    const letters = guess.split("");
+    const marks = Array(WORDLE_WORD.length).fill("absent");
+    const used = Array(WORDLE_WORD.length).fill(false);
+
+    for (let i = 0; i < WORDLE_WORD.length; i++) {
+      if (letters[i] === target[i]) {
+        marks[i] = "correct";
+        used[i] = true;
+      }
+    }
+
+    for (let i = 0; i < WORDLE_WORD.length; i++) {
+      if (marks[i] === "correct") continue;
+
+      const found = target.findIndex(
+        (letter, idx) =>
+          letter === letters[i] &&
+          !used[idx]
+      );
+
+      if (found !== -1) {
+        marks[i] = "present";
+        used[found] = true;
+      }
+    }
+
+    return marks;
   }
 
-  async function submitWordle() {
+  async function addWordleGuess() {
     if (alreadySubmitted("wordle")) return;
 
-    const correct = scoreWordleGuess(wordleGuess);
+    const guess = wordleGuess
+      .toUpperCase()
+      .replace(/[^A-Z]/g, "");
 
-    await supabase.from("submissions").insert({
-      player_id: player.id,
-      game_type: "wordle",
-      round_id: "main",
-      answer: { guess: wordleGuess },
-      score: correct ? 5 : 0,
-      locked: true
-    });
+    if (guess.length !== WORDLE_WORD.length) {
+      setMessage(
+        `Guess must be ${WORDLE_WORD.length} letters`
+      );
+      return;
+    }
 
-    setWordleGuesses([wordleGuess]);
-    loadSubmissions(player.id);
+    if (
+      wordleGuesses.length >= WORDLE_MAX_GUESSES
+    )
+      return;
+
+    const next = [
+      ...wordleGuesses,
+      {
+        guess,
+        marks: getWordleMarks(guess)
+      }
+    ];
+
+    setWordleGuesses(next);
+    setWordleGuess("");
+
+    const solved = guess === WORDLE_WORD;
+
+    if (
+      solved ||
+      next.length >= WORDLE_MAX_GUESSES
+    ) {
+      const score = solved
+        ? Math.max(1, 7 - next.length)
+        : 0;
+
+      await supabase.from("submissions").insert({
+        player_id: player.id,
+        game_type: "wordle",
+        round_id: "main",
+        answer: next,
+        score,
+        locked: true
+      });
+
+      loadSubmissions(player.id);
+    }
   }
 
   const totalScore = useMemo(() => {
-    return submissions.reduce((sum, s) => sum + (s.score || 0), 0);
+    return submissions.reduce(
+      (sum, s) => sum + (s.score || 0),
+      0
+    );
   }, [submissions]);
 
   return (
@@ -156,18 +224,28 @@ export default function Home() {
       <div style={styles.container}>
         <div style={styles.hero}>
           <div>
-            <div style={styles.badge}>🎓 Pomona College Graduation Party</div>
+            <div style={styles.badge}>
+              🎓 Pomona College Graduation Party
+            </div>
+
             <h1 style={styles.title}>
               Emma’s TV-Themed Game Lounge
             </h1>
+
             <p style={styles.subtitle}>
-              Gilmore Girls, New Girl, Chopped, and Wordle party games.
+              Gilmore Girls, New Girl,
+              Chopped, and Wordle party games.
             </p>
           </div>
 
           <div style={styles.scoreCard}>
-            <div style={styles.scoreLabel}>Score</div>
-            <div style={styles.score}>{totalScore}</div>
+            <div style={styles.scoreLabel}>
+              Score
+            </div>
+
+            <div style={styles.score}>
+              {totalScore}
+            </div>
           </div>
         </div>
 
@@ -178,11 +256,16 @@ export default function Home() {
             <input
               style={styles.input}
               value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={(e) =>
+                setName(e.target.value)
+              }
               placeholder="Your name"
             />
 
-            <button style={styles.button} onClick={createPlayer}>
+            <button
+              style={styles.button}
+              onClick={createPlayer}
+            >
               Start
             </button>
           </section>
@@ -194,32 +277,49 @@ export default function Home() {
               <h2>Who Said It?</h2>
 
               {quotes.map((q) => (
-                <div key={q.id} style={styles.question}>
+                <div
+                  key={q.id}
+                  style={styles.question}
+                >
                   <strong>{q.show}</strong>
+
                   <p>{q.quote}</p>
 
                   <select
-                    disabled={alreadySubmitted("quotes")}
+                    disabled={alreadySubmitted(
+                      "quotes"
+                    )}
                     style={styles.input}
-                    value={quoteAnswers[q.id] || ""}
+                    value={
+                      quoteAnswers[q.id] || ""
+                    }
                     onChange={(e) =>
-                      setQuoteAnswers((prev) => ({
-                        ...prev,
-                        [q.id]: e.target.value
-                      }))
+                      setQuoteAnswers(
+                        (prev) => ({
+                          ...prev,
+                          [q.id]:
+                            e.target.value
+                        })
+                      )
                     }
                   >
-                    <option value="">Choose</option>
+                    <option value="">
+                      Choose
+                    </option>
 
                     {q.options.map((o) => (
-                      <option key={o}>{o}</option>
+                      <option key={o}>
+                        {o}
+                      </option>
                     ))}
                   </select>
                 </div>
               ))}
 
               <button
-                disabled={alreadySubmitted("quotes")}
+                disabled={alreadySubmitted(
+                  "quotes"
+                )}
                 style={styles.button}
                 onClick={submitQuotes}
               >
@@ -233,7 +333,10 @@ export default function Home() {
               <h2>Word Scramble</h2>
 
               {scrambles.map((s, idx) => (
-                <div key={s.answer} style={styles.question}>
+                <div
+                  key={s.answer}
+                  style={styles.question}
+                >
                   <strong>{s.clue}</strong>
 
                   <div style={styles.scramble}>
@@ -241,25 +344,36 @@ export default function Home() {
                   </div>
 
                   <input
-                    disabled={alreadySubmitted("scramble")}
+                    disabled={alreadySubmitted(
+                      "scramble"
+                    )}
                     style={styles.input}
-                    value={scrambleAnswers[idx] || ""}
+                    value={
+                      scrambleAnswers[idx] || ""
+                    }
                     onChange={(e) =>
-                      setScrambleAnswers((prev) => ({
-                        ...prev,
-                        [idx]: e.target.value
-                      }))
+                      setScrambleAnswers(
+                        (prev) => ({
+                          ...prev,
+                          [idx]:
+                            e.target.value
+                        })
+                      )
                     }
                   />
                 </div>
               ))}
 
               <button
-                disabled={alreadySubmitted("scramble")}
+                disabled={alreadySubmitted(
+                  "scramble"
+                )}
                 style={styles.button}
                 onClick={submitScrambles}
               >
-                {alreadySubmitted("scramble")
+                {alreadySubmitted(
+                  "scramble"
+                )
                   ? "Submitted & Locked"
                   : "Submit Scrambles"}
               </button>
@@ -268,39 +382,144 @@ export default function Home() {
             <section style={styles.card}>
               <h2>Mini Wordle</h2>
 
-              <div style={styles.wordleRow}>
-                {WORDLE_WORD.split("").map((_, idx) => {
-                  const char = wordleGuess[idx] || "";
+              <p>
+                Guess the 5-letter word in 6
+                tries.
+              </p>
+
+              <div style={styles.wordleGrid}>
+                {Array.from({
+                  length:
+                    WORDLE_MAX_GUESSES
+                }).map((_, rowIdx) => {
+                  const row =
+                    wordleGuesses[rowIdx];
+
+                  const letters = row
+                    ? row.guess.split("")
+                    : Array(
+                        WORDLE_WORD.length
+                      ).fill("");
+
+                  const marks = row
+                    ? row.marks
+                    : Array(
+                        WORDLE_WORD.length
+                      ).fill("empty");
 
                   return (
-                    <div key={idx} style={styles.wordleBox}>
-                      {char}
+                    <div
+                      key={rowIdx}
+                      style={
+                        styles.wordleRow
+                      }
+                    >
+                      {letters.map(
+                        (
+                          letter,
+                          cellIdx
+                        ) => {
+                          const mark =
+                            marks[cellIdx];
+
+                          let background =
+                            "white";
+
+                          let color =
+                            "#111827";
+
+                          let border =
+                            "2px solid #ddd";
+
+                          if (
+                            mark ===
+                            "correct"
+                          ) {
+                            background =
+                              "#22c55e";
+
+                            color =
+                              "white";
+
+                            border =
+                              "2px solid #22c55e";
+                          }
+
+                          if (
+                            mark ===
+                            "present"
+                          ) {
+                            background =
+                              "#eab308";
+
+                            color =
+                              "white";
+
+                            border =
+                              "2px solid #eab308";
+                          }
+
+                          if (
+                            mark ===
+                            "absent"
+                          ) {
+                            background =
+                              "#9ca3af";
+
+                            color =
+                              "white";
+
+                            border =
+                              "2px solid #9ca3af";
+                          }
+
+                          return (
+                            <div
+                              key={
+                                cellIdx
+                              }
+                              style={{
+                                ...styles.wordleBox,
+                                background,
+                                color,
+                                border
+                              }}
+                            >
+                              {letter}
+                            </div>
+                          );
+                        }
+                      )}
                     </div>
                   );
                 })}
               </div>
 
               <input
-                disabled={alreadySubmitted("wordle")}
+                disabled={alreadySubmitted(
+                  "wordle"
+                )}
                 style={styles.input}
-                maxLength={4}
+                maxLength={5}
                 value={wordleGuess}
                 onChange={(e) =>
                   setWordleGuess(
                     e.target.value.toUpperCase()
                   )
                 }
-                placeholder="4-letter guess"
+                placeholder="5-letter guess"
               />
 
               <button
-                disabled={alreadySubmitted("wordle")}
+                disabled={alreadySubmitted(
+                  "wordle"
+                )}
                 style={styles.button}
-                onClick={submitWordle}
+                onClick={addWordleGuess}
               >
                 {alreadySubmitted("wordle")
                   ? "Submitted & Locked"
-                  : "Submit Wordle"}
+                  : "Submit Guess"}
               </button>
             </section>
 
@@ -308,8 +527,10 @@ export default function Home() {
               <a href="/leaderboard">
                 Leaderboard →
               </a>
+
               <br />
               <br />
+
               <a href="/admin">
                 Admin Dashboard →
               </a>
@@ -440,18 +661,23 @@ const styles = {
     borderRadius: 14
   },
 
+  wordleGrid: {
+    display: "flex",
+    flexDirection: "column",
+    gap: 10,
+    marginTop: 20
+  },
+
   wordleRow: {
     display: "flex",
     gap: 10,
-    marginTop: 18
+    flexWrap: "wrap"
   },
 
   wordleBox: {
-    width: 56,
-    height: 56,
-    borderRadius: 12,
-    background: "white",
-    border: "2px solid #ddd",
+    width: 58,
+    height: 58,
+    borderRadius: 14,
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
