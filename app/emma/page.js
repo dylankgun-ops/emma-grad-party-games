@@ -29,7 +29,7 @@ const questions = [
     id: "teacher-three-years",
     type: "choice",
     question: "What teacher did Emma have for 4 years?",
-    options: ["mr. elitzer", "ms. doyle", "ms. garratt", "mr. smith"],
+    options: ["Mr. Elitzer", "Ms. Doyle", "Ms. Garratt", "Mr. Hinojosa"],
     answers: ["ms. doyle"]
   },
   {
