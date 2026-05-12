@@ -93,6 +93,28 @@ const questions = [
     options: ["New Girl", "Gilmore Girls", "Chopped", "Friends"],
     answers: ["gilmore girls"]
   },
+    {
+    id: "favorite-games",
+    type: "entry",
+    question: "What two games has Emma been obsessed with recently?",
+    answers: [
+      "chess and risk",
+      "risk and chess",
+      "chess risk",
+      "risk chess"
+    ]
+  },
+  {
+    id: "interned-networks",
+    type: "entry",
+    question: "Which news networks has Emma interned for?",
+    answers: [
+      "cnn and abc",
+      "abc and cnn",
+      "cnn abc",
+      "abc cnn"
+    ]
+  },
   {
     id: "newman-teachers",
     type: "entry",
