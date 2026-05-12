@@ -71,9 +71,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (player) {
-      loadSubmissions(player.id);
-    }
+    if (player) loadSubmissions(player.id);
   }, [player]);
 
   async function createPlayer() {
@@ -119,7 +117,6 @@ export default function Home() {
     if (alreadySubmitted("quotes")) return;
 
     let score = 0;
-
     quotes.forEach((q) => {
       if (quoteAnswers[q.id] === q.answer) score++;
     });
@@ -140,7 +137,6 @@ export default function Home() {
     if (alreadySubmitted("scramble")) return;
 
     let score = 0;
-
     scrambles.forEach((s, idx) => {
       const guess = (scrambleAnswers[idx] || "")
         .toUpperCase()
@@ -202,13 +198,7 @@ export default function Home() {
 
     if (wordleGuesses.length >= WORDLE_MAX_GUESSES) return;
 
-    const next = [
-      ...wordleGuesses,
-      {
-        guess,
-        marks: getWordleMarks(guess)
-      }
-    ];
+    const next = [...wordleGuesses, { guess, marks: getWordleMarks(guess) }];
 
     setWordleGuesses(next);
     setWordleGuess("");
@@ -262,42 +252,36 @@ export default function Home() {
   return (
     <main style={styles.page}>
       <div style={styles.container}>
-        <div style={styles.hero}>
-          <div>
-            <div style={styles.badge}>🎓 Pomona College Graduation Party</div>
+        <Nav />
 
-            <h1 style={styles.title}>Emma’s TV-Themed Game Lounge</h1>
+        <div style={styles.hero}>
+          <section style={styles.heroCard}>
+            <div style={styles.badge}>🎓 Pomona College Graduation Party for Emma</div>
+
+            <h1 style={styles.title}>Emma’s TV-Themed Grad Party Game Lounge</h1>
 
             <p style={styles.subtitle}>
-              Gilmore Girls, New Girl, Chopped, and Wordle party games.
+              Cute, competitive, and a little chaotic. Play Gilmore Girls, New Girl,
+              Chopped, and Wordle party games with locked submissions and live results.
             </p>
+          </section>
 
-            <div style={styles.linkRow}>
-              <a style={styles.decoratedLink} href="/leaderboard">
-                🏆 View Party Leaderboard
-              </a>
-
-              <a style={styles.decoratedLink} href="/admin">
-                🔪 Judge the Chopped Dishes
-              </a>
-            </div>
-          </div>
-
-          <div style={styles.scoreCard}>
-            <div style={styles.scoreLabel}>Score</div>
+          <section style={styles.scoreCard}>
+            <div style={styles.scoreLabel}>Party Score</div>
             <div style={styles.score}>{totalScore}</div>
-          </div>
+            <p style={styles.subtitle}>Your saved score from submitted rounds.</p>
+          </section>
         </div>
 
         {!player && (
           <section style={styles.card}>
-            <h2>Enter your name</h2>
+            <h2 style={styles.sectionTitle}>Enter your name or team</h2>
 
             <input
               style={styles.input}
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Your name or team name"
+              placeholder="Example: Team Emma"
             />
 
             <button style={styles.button} onClick={createPlayer}>
@@ -309,13 +293,12 @@ export default function Home() {
         {player && (
           <>
             <section style={styles.card}>
-              <h2>Who Said It?</h2>
+              <h2 style={styles.sectionTitle}>Who Said It?</h2>
 
               {quotes.map((q) => (
                 <div key={q.id} style={styles.question}>
                   <strong>{q.show}</strong>
-
-                  <p>{q.quote}</p>
+                  <p style={styles.quote}>“{q.quote}”</p>
 
                   <select
                     disabled={alreadySubmitted("quotes")}
@@ -329,7 +312,6 @@ export default function Home() {
                     }
                   >
                     <option value="">Choose</option>
-
                     {q.options.map((o) => (
                       <option key={o}>{o}</option>
                     ))}
@@ -342,19 +324,16 @@ export default function Home() {
                 style={styles.button}
                 onClick={submitQuotes}
               >
-                {alreadySubmitted("quotes")
-                  ? "Submitted & Locked"
-                  : "Submit Quotes"}
+                {alreadySubmitted("quotes") ? "Submitted & Locked" : "Submit Quotes"}
               </button>
             </section>
 
             <section style={styles.card}>
-              <h2>Word Scramble</h2>
+              <h2 style={styles.sectionTitle}>Challenging Word Scramble</h2>
 
               {scrambles.map((s, idx) => (
                 <div key={s.answer} style={styles.question}>
                   <strong>{s.clue}</strong>
-
                   <div style={styles.scramble}>{s.scrambled}</div>
 
                   <input
@@ -367,6 +346,7 @@ export default function Home() {
                         [idx]: e.target.value
                       }))
                     }
+                    placeholder="No spaces"
                   />
                 </div>
               ))}
@@ -383,18 +363,15 @@ export default function Home() {
             </section>
 
             <section style={styles.card}>
-              <h2>Mini Wordle</h2>
-
+              <h2 style={styles.sectionTitle}>Mini Wordle</h2>
               <p>Guess the 5-letter word in 6 tries.</p>
 
               <div style={styles.wordleGrid}>
                 {Array.from({ length: WORDLE_MAX_GUESSES }).map((_, rowIdx) => {
                   const row = wordleGuesses[rowIdx];
-
                   const letters = row
                     ? row.guess.split("")
                     : Array(WORDLE_WORD.length).fill("");
-
                   const marks = row
                     ? row.marks
                     : Array(WORDLE_WORD.length).fill("empty");
@@ -405,8 +382,8 @@ export default function Home() {
                         const mark = marks[cellIdx];
 
                         let background = "white";
-                        let color = "#111827";
-                        let border = "2px solid #ddd";
+                        let color = "#3b2f3f";
+                        let border = "2px solid #ead2df";
 
                         if (mark === "correct") {
                           background = "#22c55e";
@@ -451,7 +428,7 @@ export default function Home() {
                 maxLength={5}
                 value={wordleGuess}
                 onChange={(e) =>
-                  setWordleGuess(e.target.value.toUpperCase())
+                  setWordleGuess(e.target.value.toUpperCase().replace(/[^A-Z]/g, ""))
                 }
                 placeholder="5-letter guess"
               />
@@ -461,18 +438,14 @@ export default function Home() {
                 style={styles.button}
                 onClick={addWordleGuess}
               >
-                {alreadySubmitted("wordle")
-                  ? "Submitted & Locked"
-                  : "Submit Guess"}
+                {alreadySubmitted("wordle") ? "Submitted & Locked" : "Submit Guess"}
               </button>
             </section>
 
             <section style={styles.card}>
-              <h2>Mystery Basket</h2>
+              <h2 style={styles.sectionTitle}>Mystery Basket</h2>
 
-              <p>
-                Generate a basket, create a dish, then submit it for judging.
-              </p>
+              <p>Generate a basket, create a dish, then submit it for judging.</p>
 
               <div style={styles.basketGrid}>
                 {basket.map((item) => (
@@ -505,34 +478,14 @@ export default function Home() {
                 <div key={entry.id} style={styles.entry}>
                   <strong>{entry.players?.name || "Unknown"}</strong>
                   <p>{entry.dish_name}</p>
-                  <small>
-                    Basket: {(entry.basket_items || []).join(", ")}
-                  </small>
-
-                  {entry.verdict && (
-                    <p>
-                      <b>{entry.verdict}</b> — {entry.judge_score} pts
-                    </p>
-                  )}
+                  <small>Basket: {(entry.basket_items || []).join(", ")}</small>
                 </div>
               ))}
             </section>
-
-            <section style={styles.card}>
-              <h2>Party Links</h2>
-
-              <div style={styles.linkRow}>
-                <a style={styles.decoratedLink} href="/leaderboard">
-                  🏆 View Party Leaderboard
-                </a>
-
-                <a style={styles.decoratedLink} href="/admin">
-                  🔪 Judge the Chopped Dishes
-                </a>
-              </div>
-            </section>
           </>
         )}
+
+        <Nav bottom />
 
         {message && <div style={styles.toast}>{message}</div>}
       </div>
@@ -540,113 +493,190 @@ export default function Home() {
   );
 }
 
+function Nav({ bottom }) {
+  return (
+    <nav style={{ ...styles.navButtons, marginTop: bottom ? 24 : 0 }}>
+      <a style={styles.navButton} href="/">
+        🏠 Main Menu
+      </a>
+
+      <a style={styles.navButton} href="/leaderboard">
+        🏆 Party Leaderboard
+      </a>
+
+      <a style={styles.navButton} href="/admin">
+        🔪 Judge Chopped Dishes
+      </a>
+    </nav>
+  );
+}
+
 const styles = {
   page: {
     minHeight: "100vh",
-    background: "linear-gradient(135deg,#fff1f5,#fff8ed)",
+    background:
+      "radial-gradient(circle at top left, #ffd6e7 0, transparent 32%), radial-gradient(circle at top right, #ffe4bf 0, transparent 34%), linear-gradient(135deg,#fff1f7,#fff3df)",
     padding: 16,
-    fontFamily: "Arial"
+    fontFamily: "Georgia, 'Times New Roman', serif",
+    color: "#3b2f3f"
   },
 
   container: {
-    maxWidth: 1100,
+    maxWidth: 1120,
     margin: "0 auto"
+  },
+
+  navButtons: {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: 12,
+    marginBottom: 22
+  },
+
+  navButton: {
+    display: "inline-block",
+    background: "rgba(255,255,255,.9)",
+    color: "#3b2f3f",
+    textDecoration: "none",
+    padding: "12px 16px",
+    borderRadius: 999,
+    fontWeight: 800,
+    border: "1px solid #f2cddd",
+    boxShadow: "0 8px 20px rgba(0,0,0,.06)"
   },
 
   hero: {
     display: "grid",
-    gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))",
+    gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))",
     gap: 20,
     marginBottom: 20
   },
 
+  heroCard: {
+    background: "rgba(255,255,255,.86)",
+    borderRadius: 28,
+    padding: 28,
+    border: "1px solid rgba(255,255,255,.8)",
+    boxShadow: "0 18px 45px rgba(65,35,55,.10)",
+    backdropFilter: "blur(10px)"
+  },
+
   badge: {
     display: "inline-block",
-    background: "#ffe4ec",
-    padding: "8px 12px",
+    background: "#ffe4b8",
+    color: "#8a5200",
+    padding: "8px 14px",
     borderRadius: 999,
-    fontWeight: 700
+    fontWeight: 800,
+    fontSize: 14
   },
 
   title: {
-    fontSize: "clamp(32px,6vw,58px)",
-    lineHeight: 1,
-    marginTop: 15
+    fontSize: "clamp(42px,7vw,76px)",
+    lineHeight: ".92",
+    marginTop: 18,
+    marginBottom: 18,
+    letterSpacing: "-2px",
+    color: "#3b2f3f"
   },
 
   subtitle: {
-    color: "#666",
-    fontSize: 18
+    color: "#6f6072",
+    fontSize: 17,
+    lineHeight: 1.6
   },
 
   scoreCard: {
-    background: "white",
-    borderRadius: 24,
-    padding: 24,
-    boxShadow: "0 10px 30px rgba(0,0,0,.08)"
+    background: "rgba(255,255,255,.86)",
+    borderRadius: 28,
+    padding: 28,
+    border: "1px solid rgba(255,255,255,.8)",
+    boxShadow: "0 18px 45px rgba(65,35,55,.10)"
   },
 
   scoreLabel: {
     textTransform: "uppercase",
-    letterSpacing: 2,
-    fontSize: 12
-  },
-
-  score: {
-    fontSize: 60,
+    letterSpacing: 3,
+    fontSize: 13,
+    color: "#9b879b",
     fontWeight: 900
   },
 
+  score: {
+    fontSize: 68,
+    fontWeight: 900,
+    marginTop: 10
+  },
+
   card: {
-    background: "rgba(255,255,255,.9)",
-    borderRadius: 24,
-    padding: 20,
-    marginBottom: 20,
-    boxShadow: "0 10px 30px rgba(0,0,0,.08)"
+    background: "rgba(255,255,255,.86)",
+    borderRadius: 28,
+    padding: 26,
+    marginBottom: 22,
+    border: "1px solid rgba(255,255,255,.8)",
+    boxShadow: "0 18px 45px rgba(65,35,55,.10)",
+    backdropFilter: "blur(10px)"
+  },
+
+  sectionTitle: {
+    fontSize: "clamp(30px,5vw,42px)",
+    lineHeight: 1,
+    marginTop: 0
   },
 
   question: {
-    background: "#fff7fa",
-    padding: 16,
-    borderRadius: 18,
-    marginTop: 14
+    background: "rgba(255,247,250,.9)",
+    padding: 18,
+    borderRadius: 20,
+    marginTop: 16,
+    border: "1px solid #f2d5e0"
+  },
+
+  quote: {
+    background: "#fff1f7",
+    borderLeft: "4px solid #ef7aa8",
+    padding: 14,
+    borderRadius: 14,
+    fontStyle: "italic"
   },
 
   input: {
     width: "100%",
     marginTop: 12,
     padding: 14,
-    borderRadius: 14,
-    border: "1px solid #ddd",
+    borderRadius: 16,
+    border: "1px solid #e6ccd8",
     boxSizing: "border-box",
-    fontSize: 16
+    fontSize: 16,
+    background: "white",
+    color: "#3b2f3f"
   },
 
   button: {
     marginTop: 16,
     padding: "14px 18px",
-    borderRadius: 14,
+    borderRadius: 16,
     border: 0,
-    background: "#111827",
+    background: "#3b2f3f",
     color: "white",
-    fontWeight: 800,
+    fontWeight: 900,
     cursor: "pointer"
   },
 
   secondaryButton: {
     marginTop: 16,
     padding: "14px 18px",
-    borderRadius: 14,
-    border: "1px solid #ddd",
+    borderRadius: 16,
+    border: "1px solid #e6ccd8",
     background: "white",
-    color: "#111827",
-    fontWeight: 800,
+    color: "#3b2f3f",
+    fontWeight: 900,
     cursor: "pointer"
   },
 
   scramble: {
     fontSize: 24,
-    letterSpacing: 4,
+    letterSpacing: 6,
     fontWeight: 900,
     marginTop: 10,
     wordBreak: "break-word"
@@ -667,8 +697,8 @@ const styles = {
   },
 
   wordleBox: {
-    width: "clamp(44px, 12vw, 58px)",
-    height: "clamp(44px, 12vw, 58px)",
+    width: "clamp(44px,12vw,58px)",
+    height: "clamp(44px,12vw,58px)",
     borderRadius: 14,
     display: "flex",
     justifyContent: "center",
@@ -690,41 +720,24 @@ const styles = {
     padding: 16,
     borderRadius: 16,
     textAlign: "center",
-    fontWeight: 800,
-    textTransform: "capitalize"
+    fontWeight: 900,
+    textTransform: "capitalize",
+    border: "1px solid #ffe2a3"
   },
 
   entry: {
-    background: "#f9fafb",
+    background: "#fff7fa",
     borderRadius: 16,
     padding: 16,
-    marginTop: 12
-  },
-
-  linkRow: {
-    display: "flex",
-    gap: 12,
-    flexWrap: "wrap",
-    marginTop: 18
-  },
-
-  decoratedLink: {
-    display: "inline-block",
-    background: "white",
-    color: "#111827",
-    textDecoration: "none",
-    padding: "13px 16px",
-    borderRadius: 999,
-    fontWeight: 800,
-    boxShadow: "0 8px 20px rgba(0,0,0,.08)",
-    border: "1px solid #f4cdd8"
+    marginTop: 12,
+    border: "1px solid #f2d5e0"
   },
 
   toast: {
     position: "fixed",
     bottom: 20,
     right: 20,
-    background: "#111827",
+    background: "#3b2f3f",
     color: "white",
     padding: "12px 18px",
     borderRadius: 14,
