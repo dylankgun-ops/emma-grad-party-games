@@ -69,7 +69,15 @@ const questions = [
       "journalism and ap history",
       "ap history and journalism",
       "journalism ap history",
-      "ap history journalism"
+      "ap history journalism",
+      "journalism and ap us history",
+      "ap us history and journalism",
+      "journalism ap history us",
+      "ap us history journalism",
+      "journalism and ap us",
+      "ap us and journalism",
+      "journalism ap us",
+      "ap us journalism"
     ]
   },
   {
