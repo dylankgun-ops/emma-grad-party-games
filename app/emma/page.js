@@ -9,7 +9,7 @@ const questions = [
     type: "choice",
     question: "What is Emma's favorite color?",
     options: ["Blue", "Pink", "Green", "Purple"],
-    answers: ["pink"]
+    answers: ["purple"]
   },
   {
     id: "college-major",
